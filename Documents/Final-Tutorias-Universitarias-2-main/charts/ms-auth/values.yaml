@@ -1,0 +1,74 @@
+# Default values for ms-auth.
+# Configuraciones específicas para el microservicio de Autenticación.
+
+# -- Número de réplicas. Para el reto de GitOps, puedes cambiar esto a 2
+# para demostrar el cambio en vivo en ArgoCD (Criterio de Éxito).
+replicaCount: 1
+
+# -- Configuración de la imagen del contenedor
+image:
+  # REQUERIDO: Reemplazar con el repositorio de tu imagen Docker de ms-auth
+  repository: sebsgof11/ms-auth # <--- EJEMPLO: Usar tu imagen correcta
+  pullPolicy: IfNotPresent
+  tag: "latest" # O la versión que estés utilizando
+
+# --- Variables de Entorno (CRÍTICAS)
+# Estas variables serán inyectadas en el contenedor (Node.js/Express)
+environment:
+  PORT: 4000
+  # REQUERIDO: Secreto para JWT (debe ser el mismo que ms-tutorias)
+  JWT_SECRET: ESTE_ES_UN_SECRETO_PARA_DESARROLLO_NO_USAR_EN_PROD
+  JWT_EXPIRES_IN: 1h
+  # Para el Criterio de Éxito de "Cambio en Vivo", puedes cambiar este valor y hacer push.
+  LOG_LEVEL: info 
+
+# --- Configuración del Servicio de Kubernetes
+service:
+  # Se deja como ClusterIP ya que el tráfico vendrá del Ingress (Kong)
+  type: ClusterIP
+  port: 4000 # Puerto interno del Servicio K8s
+  targetPort: 4000 # Puerto interno del Contenedor (el mismo que environment.PORT)
+
+# --- Probes de Salud
+# Asegúrate de que el puerto sea el 4000 y el path sea válido.
+livenessProbe:
+  httpGet:
+    path: /health # Usar el endpoint de salud si existe, o usar '/'
+    port: 4000
+  initialDelaySeconds: 10
+  periodSeconds: 15
+readinessProbe:
+  httpGet:
+    path: /health # Usar el endpoint de salud si existe, o usar '/'
+    port: 4000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+# --- Configuraciones por defecto (mantener si no se modifican)
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+ingress:
+  enabled: false # Desactivado, lo gestionará el Umbrella Chart/Kong
+httpRoute:
+  enabled: false
+resources: {}
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+volumes: []
+volumeMounts: []
+nodeSelector: {}
+tolerations: []
+affinity: {}

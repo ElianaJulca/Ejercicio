@@ -1,0 +1,90 @@
+# Default values for ms-tutorias.
+# Configuraciones para el Microservicio Orquestador de Tutorías.
+
+# -- Número de réplicas
+replicaCount: 1
+
+# -- Configuración de la imagen del contenedor
+image:
+  # REQUERIDO: Reemplazar con el repositorio de tu imagen Docker de ms-tutorias
+  repository: sebsgof11/ms-tutorias # <--- USAR TU IMAGEN DOCKER CORRECTA
+  pullPolicy: IfNotPresent
+  tag: "latest" # O la versión que estés utilizando
+
+# --- Variables de Entorno (CRÍTICAS)
+# Estas variables serán inyectadas en el contenedor (Node.js/Express)
+environment:
+  PORT: 3000
+  LOG_LEVEL: info
+  SERVICE_NAME: MS_Tutorias
+  
+  # URLs de Microservicios (Usando los nombres internos de Kubernetes)
+  # NOTA: Asegúrate que los nombres 'ms-usuarios', 'ms-agenda', etc. coincidan 
+  # con los nombres de servicio que usarán los otros Subcharts.
+  MS_USUARIOS_URL: http://ms-usuarios:3001/usuarios 
+  MS_AGENDA_URL: http://ms-agenda:3002/agenda 
+  MS_NOTIFICACIONES_URL: http://ms-notificaciones:3003/notificaciones
+  
+  # Secreto JWT (debe ser el mismo que ms-auth)
+  JWT_SECRET: ESTE_ES_UN_SECRETO_PARA_DESARROLLO_NO_USAR_EN_PROD
+  
+  # Conexión a RabbitMQ
+  # NOTA: 'rabbitmq' será el nombre del servicio de RabbitMQ dentro del clúster.
+  RABBITMQ_URL: amqp://rabbitmq:5672 
+
+# --- Configuración de la Base de Datos DEDICADA (db-tutorias)
+# Los valores aquí serán usados para construir las variables DB_HOST, DB_USER, etc.
+db:
+  # 'db-tutorias' será el nombre del servicio k8s de la DB (definido en el Umbrella Chart)
+  host: db-tutorias 
+  port: 5432       
+  user: user_tutorias
+  password: password_tutorias
+  name: db_tutorias
+  
+# --- Configuración del Servicio de Kubernetes
+service:
+  type: ClusterIP
+  port: 3000 
+  targetPort: 3000 # Puerto interno del contenedor
+
+# --- Probes de Salud
+livenessProbe:
+  httpGet:
+    path: /health # Usar el endpoint de salud si existe, o usar '/'
+    port: 3000
+  initialDelaySeconds: 15
+  periodSeconds: 15
+readinessProbe:
+  httpGet:
+    path: /health # Usar el endpoint de salud si existe, o usar '/'
+    port: 3000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+# --- Configuraciones por defecto (limpias)
+replicaCount: 1
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+ingress:
+  enabled: false
+httpRoute:
+  enabled: false
+resources: {}
+autoscaling:
+  enabled: false
+volumes: []
+volumeMounts: []
+nodeSelector: {}
+tolerations: []
+affinity: {}

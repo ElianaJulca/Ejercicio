@@ -1,0 +1,78 @@
+# tutorias-stack/values.yaml
+
+# Configuración Global
+global:
+  namespace: tutorias # Nombre del Namespace para el proyecto
+
+# -----------------------------------
+# 1. CONFIGURACIÓN DE INFRAESTRUCTURA
+# -----------------------------------
+
+# Configuraciones para RabbitMQ
+rabbitmq-broker:
+  enabled: true
+  auth:
+    username: user
+    password: password # Contraseña que los microservicios usarán en RABBITMQ_URL
+  replicaCount: 1
+
+# Configuraciones de las 3 Bases de Datos PostgreSQL
+# Nota: La configuración de cada DB debe reflejar las credenciales que usaste 
+# en los .Values.db de tus microservicios (ms-usuarios, ms-agenda, ms-tutorias).
+
+db-usuarios:
+  enabled: true
+  auth:
+    username: user_usuarios
+    password: password_usuarios
+    database: db_usuarios
+  primary:
+    service:
+      ports:
+        postgresql: 5432
+  persistence:
+    enabled: false # Desactivar persistencia para pruebas rápidas
+
+db-agenda:
+  enabled: true
+  auth:
+    username: user_agenda
+    password: password_agenda
+    database: db_agenda
+  primary:
+    service:
+      ports:
+        postgresql: 5432
+  persistence:
+    enabled: false
+
+db-tutorias:
+  enabled: true
+  auth:
+    username: user_tutorias
+    password: password_tutorias
+    database: db_tutorias
+  primary:
+    service:
+      ports:
+        postgresql: 5432
+  persistence:
+    enabled: false
+
+# -----------------------------------
+# 2. CONFIGURACIÓN DE APLICACIÓN
+# -----------------------------------
+
+# Sobreescribir el número de réplicas de ms-auth (DEMOSTRACIÓN DE CAMBIO EN VIVO)
+ms-auth:
+  replicaCount: 1
+  # Podemos sobreescribir variables de entorno
+  environment:
+    LOG_LEVEL: info # <-- Cambiaremos esto en el Reto
+    JWT_SECRET: ESTE_ES_UN_SECRETO_PARA_DESARROLLO_NO_USAR_EN_PROD
+    
+ms-tutorias:
+  replicaCount: 1
+  # Podemos sobreescribir las URLs de los otros MS si es necesario.
+  
+# Dejar los demás microservicios en sus valores por defecto (replicaCount: 1)

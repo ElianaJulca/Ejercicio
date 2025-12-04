@@ -1,0 +1,80 @@
+# Default values for ms-agenda.
+# Configuraciones para el Microservicio de Gestión de Agenda.
+
+# -- Número de réplicas
+replicaCount: 1
+
+# -- Configuración de la imagen del contenedor
+image:
+  # REQUERIDO: Reemplazar con el repositorio de tu imagen Docker de ms-agenda
+  repository: sebsgof11/ms-agenda # <--- USAR TU IMAGEN DOCKER CORRECTA
+  pullPolicy: IfNotPresent
+  tag: "latest" 
+
+# --- Variables de Entorno (CRÍTICAS)
+# Este microservicio solo necesita su puerto, nivel de log y la conexión a su DB.
+environment:
+  PORT: 3002
+  LOG_LEVEL: info
+  SERVICE_NAME: MS_Agenda
+  
+  # RabbitMQ es necesario para este servicio, ya que puede necesitar comunicarse
+  # asíncronamente o manejar eventos futuros. Si no lo usa en tu código, puedes omitirlo.
+  RABBITMQ_URL: amqp://rabbitmq:5672 
+
+# --- Configuración de la Base de Datos DEDICADA (db-agenda)
+# Los valores aquí serán usados para construir las variables DB_HOST, DB_USER, etc.
+db:
+  # 'db-agenda' será el nombre del servicio k8s de la DB (definido en el Umbrella Chart)
+  host: db-agenda 
+  port: 5432       
+  user: user_agenda
+  password: password_agenda
+  name: db_agenda
+  
+# --- Configuración del Servicio de Kubernetes
+service:
+  type: ClusterIP
+  port: 3002 
+  targetPort: 3002 # Puerto interno del contenedor
+
+# --- Probes de Salud
+livenessProbe:
+  httpGet:
+    path: /health # Usar el endpoint de salud si existe, o usar '/'
+    port: 3002
+  initialDelaySeconds: 15
+  periodSeconds: 15
+readinessProbe:
+  httpGet:
+    path: /health # Usar el endpoint de salud si existe, o usar '/'
+    port: 3002
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+# --- Configuraciones por defecto (limpias)
+replicaCount: 1
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+ingress:
+  enabled: false
+httpRoute:
+  enabled: false
+resources: {}
+autoscaling:
+  enabled: false
+volumes: []
+volumeMounts: []
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,77 @@
+# Default values for ms-usuarios.
+# Configuraciones para el Microservicio de Gestión de Usuarios.
+
+# -- Número de réplicas
+replicaCount: 1
+
+# -- Configuración de la imagen del contenedor
+image:
+  # REQUERIDO: Reemplazar con el repositorio de tu imagen Docker de ms-usuarios
+  repository: sebsgof11/ms-usuarios # <--- USAR TU IMAGEN DOCKER CORRECTA
+  pullPolicy: IfNotPresent
+  tag: "latest" 
+
+# --- Variables de Entorno (CRÍTICAS)
+# Este microservicio solo necesita su puerto, nivel de log y la conexión a su DB.
+environment:
+  PORT: 3001
+  LOG_LEVEL: info
+  SERVICE_NAME: MS_Usuarios
+  
+  # RabbitMQ es necesario si este servicio genera o consume eventos asíncronos.
+  RABBITMQ_URL: amqp://rabbitmq:5672 
+
+# --- Configuración de la Base de Datos DEDICADA (db-usuarios)
+db:
+  # 'db-usuarios' será el nombre del servicio k8s de la DB (definido en el Umbrella Chart)
+  host: db-usuarios 
+  port: 5432       
+  user: user_usuarios
+  password: password_usuarios
+  name: db_usuarios
+  
+# --- Configuración del Servicio de Kubernetes
+service:
+  type: ClusterIP
+  port: 3001 
+  targetPort: 3001 # Puerto interno del contenedor
+
+# --- Probes de Salud
+livenessProbe:
+  httpGet:
+    path: /health # Usar el endpoint de salud si existe, o usar '/'
+    port: 3001
+  initialDelaySeconds: 15
+  periodSeconds: 15
+readinessProbe:
+  httpGet:
+    path: /health # Usar el endpoint de salud si existe, o usar '/'
+    port: 3001
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+# --- Configuraciones por defecto (limpias)
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+ingress:
+  enabled: false
+httpRoute:
+  enabled: false
+resources: {}
+autoscaling:
+  enabled: false
+volumes: []
+volumeMounts: []
+nodeSelector: {}
+tolerations: []
+affinity: {}

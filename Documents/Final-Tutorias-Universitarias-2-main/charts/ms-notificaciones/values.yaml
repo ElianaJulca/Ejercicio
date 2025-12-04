@@ -1,0 +1,72 @@
+# Default values for ms-notificaciones.
+# Configuraciones para el Microservicio de Notificaciones (Worker/Consumidor).
+
+# -- Número de réplicas
+replicaCount: 1
+
+# -- Configuración de la imagen del contenedor
+image:
+  # REQUERIDO: Reemplazar con el repositorio de tu imagen Docker de ms-notificaciones
+  repository: sebsgof11/ms-notificaciones # <--- USAR TU IMAGEN DOCKER CORRECTA
+  pullPolicy: IfNotPresent
+  tag: "latest" 
+
+# --- Variables de Entorno (CRÍTICAS)
+# Este worker necesita el URL de RabbitMQ para escuchar los eventos.
+environment:
+  PORT: 3003
+  LOG_LEVEL: info
+  SERVICE_NAME: MS_Notificaciones
+  
+  # Conexión a RabbitMQ
+  # NOTA: 'rabbitmq' es el nombre del servicio de RabbitMQ dentro del clúster.
+  RABBITMQ_URL: amqp://rabbitmq:5672 
+
+# --- Configuración del Servicio de Kubernetes
+# Aunque es un worker, necesita un ClusterIP Service para que Kubernetes lo pueda referenciar y gestionar.
+service:
+  type: ClusterIP
+  port: 3003 
+  targetPort: 3003 
+
+# --- Probes de Salud
+# Los workers a menudo no tienen un endpoint HTTP, pero se configuran por defecto.
+# Si tu worker no expone un endpoint de salud (/health), podrías deshabilitar o simplificar esto.
+livenessProbe:
+  httpGet:
+    path: /health # Usar el endpoint de salud si existe, o usar '/'
+    port: 3003
+  initialDelaySeconds: 15
+  periodSeconds: 15
+readinessProbe:
+  httpGet:
+    path: /health # Usar el endpoint de salud si existe, o usar '/'
+    port: 3003
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+# --- Configuraciones por defecto (limpias)
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+ingress:
+  enabled: false
+httpRoute:
+  enabled: false
+resources: {}
+autoscaling:
+  enabled: false
+volumes: []
+volumeMounts: []
+nodeSelector: {}
+tolerations: []
+affinity: {}
