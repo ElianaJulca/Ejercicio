@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  # Nombre de la aplicación en la interfaz de ArgoCD
+  name: tutorias-universitarias-stack
+  # El namespace donde reside ArgoCD (generalmente argocd)
+  namespace: argocd
+spec:
+  project: default
+  # --- FUENTE DE LA VERDAD (GIT) ---
+  source:
+    # CRÍTICO: Reemplazar con la URL HTTPS o SSH de tu repositorio
+    repoURL: <TU_URL_DEL_REPOSITORIO_GIT> 
+    targetRevision: HEAD
+    # La ruta dentro del repositorio donde está el Umbrella Chart
+    path: tutorias-stack 
+  # --- DESTINO (KUBERNETES) ---
+  destination:
+    server: https://kubernetes.default.svc
+    # El Namespace donde se desplegarán todos los microservicios
+    namespace: tutorias
+  # --- POLÍTICA GITOPS ---
+  syncPolicy:
+    automated:
+      # ArgoCD aplicará los cambios automáticamente cuando detecte una diferencia en Git
+      prune: true
+      selfHeal: true # Si alguien borra algo, ArgoCD lo recrea inmediatamente (Resurrección)
+    syncOptions:
+    - CreateNamespace=true # Permite que ArgoCD cree el namespace 'tutorias'
+    - ServerSideApply=true # Recomendado para manejar charts complejos
