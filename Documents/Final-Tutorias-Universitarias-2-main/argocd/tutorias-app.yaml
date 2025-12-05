@@ -12,6 +12,8 @@ spec:
     targetRevision: HEAD
     # ESTA ES LA LÍNEA CRÍTICA A CORREGIR:
     path: Documents/Final-Tutorias-Universitarias-2-main/tutorias-stack
+    # Si la estructura fuera diferente, usarías la ruta exacta:
+    # path: Final-Tutorias-Universitarias-2-main/tutorias-stack 
   destination:
     server: https://kubernetes.default.svc
     # El Namespace donde se desplegarán todos los microservicios
