@@ -8,11 +8,9 @@ metadata:
 spec:
   project: default
   # --- FUENTE DE LA VERDAD (GIT) ---
-  source:
-    # CRÍTICO: Reemplazar con la URL HTTPS o SSH de tu repositorio
-    repoURL: <TU_URL_DEL_REPOSITORIO_GIT> 
+  source: # <--- CORRECTO: Este es el contenedor de la fuente
+    repoURL: https://github.com/ElianaJulca/Ejercicio.git # <-- Los campos ahora están anidados
     targetRevision: HEAD
-    # La ruta dentro del repositorio donde está el Umbrella Chart
     path: tutorias-stack 
   # --- DESTINO (KUBERNETES) ---
   destination:
