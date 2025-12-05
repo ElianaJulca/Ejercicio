@@ -7,12 +7,11 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  # --- FUENTE DE LA VERDAD (GIT) ---
-  source: # <--- CORRECTO: Este es el contenedor de la fuente
-    repoURL: https://github.com/ElianaJulca/Ejercicio.git # <-- Los campos ahora están anidados
+  source:
+    repoURL: https://github.com/ElianaJulca/Ejercicio.git
     targetRevision: HEAD
-    path: tutorias-stack 
-  # --- DESTINO (KUBERNETES) ---
+    # ESTA ES LA LÍNEA CRÍTICA A CORREGIR:
+    path: Documents/Final-Tutorias-Universitarias-2-main/tutorias-stack
   destination:
     server: https://kubernetes.default.svc
     # El Namespace donde se desplegarán todos los microservicios
