@@ -4,12 +4,11 @@ metadata:
   name: tutorias-universitarias-stack
   namespace: argocd
 spec:
-  project: default
+  project: default  # <--- Debe tener el valor 'default'
   source:
     repoURL: https://github.com/ElianaJulca/Ejercicio.git
     targetRevision: HEAD
-    # RUTA CORREGIDA: Se ajusta a la estructura anidada de tu repositorio Git.
-    path: Documents/Final-Tutorias-Universitarias-2-main/tutorias-stack
+    path: Documents/Final-Tutorias-Universitarias-2-main/tutorias-stack # <--- RUTA COMPLETA
   destination:
     server: https://kubernetes.default.svc
     namespace: tutorias
