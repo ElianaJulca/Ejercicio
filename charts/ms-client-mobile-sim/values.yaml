@@ -1,0 +1,68 @@
+# Default values for ms-client-mobile-sim.
+# Configuraciones para el Cliente Móvil Simulado (Frontend).
+
+# -- Número de réplicas
+replicaCount: 1
+
+# -- Configuración de la imagen del contenedor
+image:
+  # REQUERIDO: Reemplazar con el repositorio de tu imagen Docker de client-mobile-sim
+  repository: sebsgof11/client-mobile-sim # <--- USAR TU IMAGEN DOCKER CORRECTA
+  pullPolicy: IfNotPresent
+  tag: "latest" 
+
+# --- Variables de Entorno (CRÍTICAS)
+# Este frontend necesita las URLs de los servicios a los que debe conectarse (API Gateway y Auth).
+environment:
+  PORT: 8080 # Puerto interno del contenedor (Node.js/Express)
+  
+  # URLs de los servicios de Backend
+  # Asumiendo que Kong/Gateway es el punto de entrada
+  API_BASE_URL: http://kong-ingress:80/api/tutorias 
+  AUTH_SERVICE_URL: http://kong-ingress:80/api/auth/auth 
+
+# --- Configuración del Servicio de Kubernetes
+service:
+  type: ClusterIP
+  port: 8080 
+  targetPort: 8080 # Puerto interno del contenedor
+
+# --- Probes de Salud
+livenessProbe:
+  httpGet:
+    path: / # El frontend debe responder al path raíz
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8080
+  initialDelaySeconds: 2
+  periodSeconds: 5
+
+# --- Configuraciones por defecto (limpias)
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+ingress:
+  enabled: false
+httpRoute:
+  enabled: false
+resources: {}
+autoscaling:
+  enabled: false
+volumes: []
+volumeMounts: []
+nodeSelector: {}
+tolerations: []
+affinity: {}

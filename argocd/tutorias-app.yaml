@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tutorias-universitarias-stack
+  namespace: argocd
+spec:
+  project: default  # <--- Debe tener el valor 'default'
+  source:
+    repoURL: https://github.com/ElianaJulca/Ejercicio.git
+    targetRevision: HEAD
+    path: Documents/Final-Tutorias-Universitarias-2-main/tutorias-stack # <--- RUTA COMPLETA
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tutorias
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true

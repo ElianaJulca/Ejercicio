@@ -1,0 +1,70 @@
+# tutorias-stack/Chart.yaml
+apiVersion: v2
+name: tutorias-stack
+description: Umbrella Chart para la arquitectura de Microservicios de Tutorias Universitarias.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+# -----------------------------------
+# 1. DEPENDENCIAS DE INFRAESTRUCTURA (Externas, Bitnami)
+# -----------------------------------
+- name: rabbitmq
+  version: "13.x.x" 
+  repository: "oci://registry-1.docker.io/bitnamicharts"
+  alias: rabbitmq-broker
+  condition: rabbitmq-broker.enabled
+
+# Base de Datos PostgreSQL 1/3: db-usuarios
+- name: postgresql
+  version: "14.x.x" 
+  repository: "oci://registry-1.docker.io/bitnamicharts"
+  alias: db-usuarios
+  condition: db-usuarios.enabled
+
+# Base de Datos PostgreSQL 2/3: db-agenda
+- name: postgresql
+  version: "14.x.x" 
+  repository: "oci://registry-1.docker.io/bitnamicharts"
+  alias: db-agenda
+  condition: db-agenda.enabled
+
+# Base de Datos PostgreSQL 3/3: db-tutorias
+- name: postgresql
+  version: "14.x.x" 
+  repository: "oci://registry-1.docker.io/bitnamicharts"
+  alias: db-tutorias
+  condition: db-tutorias.enabled
+
+# -----------------------------------
+# 2. DEPENDENCIAS DE APLICACIÓN (Internas, Subcharts)
+# -----------------------------------
+- name: ms-auth
+  version: "0.1.0"
+  repository: "file://charts"
+  alias: ms-auth
+- name: ms-tutorias
+  version: "0.1.0"
+  repository: "file://charts"
+  alias: ms-tutorias
+- name: ms-usuarios
+  version: "0.1.0"
+  repository: "file://charts"
+  alias: ms-usuarios
+- name: ms-agenda
+  version: "0.1.0"
+  repository: "file://charts"
+  alias: ms-agenda
+- name: ms-notificaciones
+  version: "0.1.0"
+  repository: "file://charts"
+  alias: ms-notificaciones
+- name: ms-client-mobile-sim
+  version: "0.1.0"
+  repository: "file://charts"
+  alias: ms-client-mobile-sim
+- name: ms-tracking-dashboard
+  version: "0.1.0"
+  repository: "file://charts"
+  alias: ms-tracking-dashboard
